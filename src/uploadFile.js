@@ -1,20 +1,27 @@
-const uploadFile = async (file) => {
-  const formData = new FormData();
-  formData.append("file", file);
+import axios from "axios";
+
+const uploadFile = async (formData, modelIds) => {
+  const apiUrl = "https://3299-34-125-155-47.ngrok-free.app/predict";
 
   try {
-    // Simulate a server response after uploading the file
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Simulated response data
-    const responseData = {
-      success: true,
-      message: "File uploaded successfully",
-    };
-
-    return responseData;
+    const response = await axios.post(
+      `${apiUrl}?${modelIds
+        .map((modelId) => `substances=${String(modelId).split(",").join("")}`)
+        .join("&")}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response;
   } catch (error) {
-    throw error;
+    console.error("Error uploading file:", error);
+    if (error.response) {
+      console.error("API Response:", error.response.data);
+    }
+    throw error.response || error;
   }
 };
 
